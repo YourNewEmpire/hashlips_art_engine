@@ -8,9 +8,9 @@ const { NETWORK } = require(path.join(basePath, "constants/network.js"));
 
 const network = NETWORK.eth;
 
-// General metadata for Ethereum
-const namePrefix = "Your Collection";
-const description = "Remember to replace this description";
+// General metadata for Ethereum1
+const namePrefix = "Arch NFT";
+const description = "";
 const baseUri = "ipfs://NewUriToReplace";
 
 const solanaMetadata = {

@@ -48,7 +48,7 @@ bower_components
 build/Release
 
 # Dependency directories
-
+moralisIPFS/build
 build/
 dist/
 node_modules/

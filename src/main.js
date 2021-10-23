@@ -10,7 +10,7 @@ const { createCanvas, loadImage } = require(path.join(
   basePath,
   "/node_modules/canvas"
 ));
-const buildDir = path.join(basePath, "/build");
+const buildDir = path.join(basePath, "/moralisIPFS/build");
 const layersDir = path.join(basePath, "/layers");
 const {
   format,
