@@ -1,3 +1,44 @@
+# Setup for Moralis IPFS:
+
+Sign up at [Moralis](https://moralis.io/)
+Once logged in on the admin panel, navigate to WEB3 API
+![](https://github.com/YourNewEmpire/hashlips_art_engine/blob/main/common/moralisweb3api.png)
+
+Add your Moralis key `.env`
+```
+MORALIS=your-endpoint-key
+```
+You may want to read the original HashLips docs if you have not.
+You can understand how to pass in your own image layers for regenerative NFTs.
+The code comes with some boilperplate layers from HashLips that I have used. 
+
+To begin, run `npm run build` or `node index.js`
+
+Your images and jsons are now written to the moralisIPFS/build folder.
+
+Ensure you have your own collection image and json in the 'collection#1' folder.
+You can rearrange the folder structure how you like, as long as the scripts are reading fine.
+
+## Scripts 
+**You need to upload images first, for the JSONs to read the image later.**
+
+*Run `node moralisIPFS/scripts/collectionImage.js` to get the url of the image in console.
+*Paste this link in line 25 of `collectionJson.js` then run `node moralisIPFS/scripts/collectionJson.js`.
+*Now copy the log from `collectionJson.js` and keep somewhere to put in your ERC721 contract `contractUri` function for opensea.
+
+You can do the same for the images721 and metadata721 scripts.
+
+You will have to hard-code the number of generations in the `numOfItems.js`. This is read from the images721 and metadata721 scripts.
+
+After `images721.js` logs, remember to grab your JSON links from the console for minting your nfts with.
+
+Feel free to try my boilperplate for ERC721 OpenSea NFTs [here]()
+
+example image link for json script: 'ipfs://Qmbd46WBvCK33kuGcEb7LtQkWcXW3ygDEgBv5rdFvnJ7RX/collection-1/image.gif'
+
+
+[This video from Moralis played a part](https://www.youtube.com/watch?v=VglTdr0n5ZQ)
+
 # Welcome to HashLips 👄
 
 ![](https://github.com/HashLips/hashlips_art_engine/blob/main/logo.png)
