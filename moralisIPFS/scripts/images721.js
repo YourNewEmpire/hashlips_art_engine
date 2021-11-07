@@ -2,6 +2,7 @@ let fs = require('fs')
 const path = require("path");
 let axios = require('axios')
 require('dotenv').config()
+const numOfItems = require('./numOfItems')
 
 const MORALIS_ENDPOINT = process.env.MORALIS
 
@@ -11,10 +12,10 @@ let promiseArray = []
 let imageArray = []
 
 
-for (let i = 1; i <= 5; i++) {
+for (let i = 1; i <= numOfItems; i++) {
       console.log(i)
       promiseArray.push(new Promise((res, rej) => {
-            fs.readFile((`${__dirname}/build/images/${i}.png`), (err, data) => {
+            fs.readFile(path.resolve(__dirname, `../build/images/${i}.png`), (err, data) => {
                   if (err) rej();
                   imageArray.push({
                         path: `images/${i}.png`,

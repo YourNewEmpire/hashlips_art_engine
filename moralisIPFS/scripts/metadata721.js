@@ -2,17 +2,19 @@ let fs = require("fs");
 let axios = require("axios");
 const path = require("path");
 require('dotenv').config()
+const numOfItems = require('./numOfItems')
+
 const MORALIS_ENDPOINT = process.env.MORALIS
 
 
 let jsonArray = [];
 let promiseArray = [];
 
-for (let i = 1; i <= 5; i++) {
+for (let i = 1; i <= numOfItems; i++) {
       promiseArray.push(new Promise((res, rej) => {
-            fs.readFile((`${__dirname}/build/json/${i}.json`), (err, data) => {
+            fs.readFile(path.resolve(__dirname, `..build/json/${i}.json`), (err, data) => {
                   if (err) rej();
-
+                  //? Read the JSONs and use spread syntax to change the 'image' key/value
                   const parsed = JSON.parse(data)
                   jsonArray.push({
                         path: `metadata/${i}.json`,
@@ -26,7 +28,7 @@ for (let i = 1; i <= 5; i++) {
       }))
 }
 
-//? Once all promises are done, then post json array to Moralis IPFS endpoint
+//? Once all promises (file reads and parses) are done, then post json array to Moralis IPFS endpoint
 Promise.all(promiseArray).then(() => {
       axios.post("https://deep-index.moralis.io/api/v2/ipfs/uploadFolder",
             jsonArray,

@@ -1,3 +1,4 @@
+//todo - bundle collection uploads in one script
 let fs = require('fs')
 const path = require("path");
 let axios = require('axios')
@@ -8,15 +9,21 @@ const MORALIS_ENDPOINT = process.env.MORALIS
 
 //? Promises to be pushed to this var
 let promiseArray = []
-//? For IPFS
-let imageData = []
+//? Array of json For IPFS
+let jsonData = []
 
+//! Copy the IPFS link from image script into the content object
 promiseArray.push(new Promise((res, rej) => {
-      fs.readFile((`${__dirname}/collection#1/collection-image.gif`), (err, data) => {
+      fs.readFile(path.resolve(__dirname, '../collection#1/metadata.json'), (err, data) => {
             if (err) rej();
-            imageData.push({
-                  path: 'collection-1/image.gif',
-                  content: data.toString("base64")
+            const parsed = JSON.parse(data)
+            jsonData.push({
+                  path: `collection-1/collection.json`,
+                  content: {
+                        ...parsed,
+                        //! here
+                        image: `ipfs://Qmbd46WBvCK33kuGcEb7LtQkWcXW3ygDEgBv5rdFvnJ7RX/collection-1/image.gif`
+                  }
             })
             res();
       })
@@ -26,7 +33,7 @@ promiseArray.push(new Promise((res, rej) => {
 //? Once all promises are done, then post json array to Moralis IPFS endpoint
 Promise.all(promiseArray).then(() => {
       axios.post("https://deep-index.moralis.io/api/v2/ipfs/uploadFolder",
-            imageData,
+            jsonData,
             {
                   headers: {
                         "X-API-KEY": MORALIS_ENDPOINT,
