@@ -1,3 +1,7 @@
+# My working example:
+* [OpenSea](https://opensea.io/collection/arch-regen-nfts)
+* [PolygonScan](https://polygonscan.com/address/0xe659d2a4d136d3f12c815304fa928fdaa43c17ba)
+
 # Setup for Moralis IPFS:
 
 Sign up at [Moralis](https://moralis.io/)
