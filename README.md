@@ -65,7 +65,7 @@ To find out more please visit:
 
 ![](https://github.com/HashLips/hashlips_art_engine/blob/main/banner.png)
 
-Create generative art by using the canvas api and node js. Before you use the generation engine, make sure you have node.js installed.
+Create generative art by using the canvas api and node js. Before you use the generation engine, make sure you have node.js(v10.18.0) installed.
 
 ## Installation 🛠️
 
@@ -156,6 +156,8 @@ If you want to play around with different blending modes, you can add a `blend: 
 
 If you need a layers to have a different opacity then you can add the `opacity: 0.7` field to the layersOrder `options` object as well.
 
+If you want to have a layer _ignored_ in the DNA uniqueness check, you can set `bypassDNA: true` in the `options` object. This has the effect of making sure the rest of the traits are unique while not considering the `Background` Layers as traits, for example. The layers _are_ included in the final image.
+
 To use a different metadata attribute name you can add the `displayName: "Awesome Eye Color"` to the `options` object. All options are optional and can be addes on the same layer if you want to.
 
 Here is an example on how you can play around with both filter fields:
@@ -165,7 +167,11 @@ const layerConfigurations = [
   {
     growEditionSizeTo: 5,
     layersOrder: [
-      { name: "Background" },
+      { name: "Background" , {
+        options: {
+          bypassDNA: false;
+        }
+      }},
       { name: "Eyeball" },
       {
         name: "Eye color",
@@ -305,6 +311,21 @@ const pixelFormat = {
 };
 ```
 
+### Generate GIF images from collection
+
+In order to export gifs based on the layers created, you just need to set the export on the `gif` object in the `src/config.js` file to `true`. You can also play around with the `repeat`, `quality` and the `delay` of the exported gif.
+
+Setting the `repeat: -1` will produce a one time render and `repeat: 0` will loop forever.
+
+```js
+const gif = {
+  export: true,
+  repeat: 0,
+  quality: 100,
+  delay: 500,
+};
+```
+
 ### Printing rarity data (Experimental feature)
 
 To see the percentages of each attribute across your collection, run:
@@ -316,15 +337,22 @@ npm run rarity
 The output will look something like this:
 
 ```sh
-Trait type: Bottom lid
-{ trait: 'High', chance: '20', occurrence: '15% out of 100%' }
-{ trait: 'Low', chance: '40', occurrence: '40% out of 100%' }
-{ trait: 'Middle', chance: '40', occurrence: '45% out of 100%' }
-
-Trait type: Iris
-{ trait: 'Large', chance: '20', occurrence: '15% out of 100%' }
-{ trait: 'Medium', chance: '20', occurrence: '15% out of 100%' }
-{ trait: 'Small', chance: '60', occurrence: '70% out of 100%' }
+Trait type: Top lid
+{
+  trait: 'High',
+  chance: '30',
+  occurrence: '3 in 20 editions (15.00 %)'
+}
+{
+  trait: 'Low',
+  chance: '20',
+  occurrence: '3 in 20 editions (15.00 %)'
+}
+{
+  trait: 'Middle',
+  chance: '50',
+  occurrence: '14 in 20 editions (70.00 %)'
+}
 ```
 
 Hope you create some awesome artworks with this code 👄
