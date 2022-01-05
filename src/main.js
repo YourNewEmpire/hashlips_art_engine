@@ -1,7 +1,10 @@
-const basePath = process.cwd();
-const { NETWORK } = require(`${basePath}/constants/network.js`);
+"use strict";
+
+const path = require("path");
+const isLocal = typeof process.pkg === "undefined";
+const basePath = isLocal ? process.cwd() : path.dirname(process.execPath);
+const { NETWORK } = require(path.join(basePath, "constants/network.js"));
 const fs = require("fs");
-<<<<<<< HEAD
 const sha1 = require(path.join(basePath, "/node_modules/sha1"));
 const { createCanvas, loadImage } = require(path.join(
   basePath,
@@ -9,12 +12,6 @@ const { createCanvas, loadImage } = require(path.join(
 ));
 const buildDir = path.join(basePath, "/moralisIPFS/build");
 const layersDir = path.join(basePath, "/layers");
-=======
-const sha1 = require(`${basePath}/node_modules/sha1`);
-const { createCanvas, loadImage } = require(`${basePath}/node_modules/canvas`);
-const buildDir = `${basePath}/moralisIPFS/build`;
-const layersDir = `${basePath}/layers`;
->>>>>>> 304fcfc643c29e0943e4dcc38a751752607de1ad
 const {
   format,
   baseUri,
@@ -30,29 +27,21 @@ const {
   namePrefix,
   network,
   solanaMetadata,
-  gif,
-} = require(`${basePath}/src/config.js`);
+} = require(path.join(basePath, "/src/config.js"));
 const canvas = createCanvas(format.width, format.height);
 const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = format.smoothing;
 var metadataList = [];
 var attributesList = [];
 var dnaList = new Set();
 const DNA_DELIMITER = "-";
-const HashlipsGiffer = require(`${basePath}/modules/HashlipsGiffer.js`);
-
-let hashlipsGiffer = null;
 
 const buildSetup = () => {
   if (fs.existsSync(buildDir)) {
     fs.rmdirSync(buildDir, { recursive: true });
   }
   fs.mkdirSync(buildDir);
-  fs.mkdirSync(`${buildDir}/json`);
-  fs.mkdirSync(`${buildDir}/images`);
-  if (gif.export) {
-    fs.mkdirSync(`${buildDir}/gifs`);
-  }
+  fs.mkdirSync(path.join(buildDir, "/json"));
+  fs.mkdirSync(path.join(buildDir, "/images"));
 };
 
 const getRarityWeight = (_str) => {
@@ -67,8 +56,7 @@ const getRarityWeight = (_str) => {
 };
 
 const cleanDna = (_str) => {
-  const withoutOptions = removeQueryStrings(_str);
-  var dna = Number(withoutOptions.split(":").shift());
+  var dna = Number(_str.split(":").shift());
   return dna;
 };
 
@@ -109,10 +97,6 @@ const layersSetup = (layersOrder) => {
       layerObj.options?.["opacity"] != undefined
         ? layerObj.options?.["opacity"]
         : 1,
-    bypassDNA:
-      layerObj.options?.["bypassDNA"] !== undefined
-        ? layerObj.options?.["bypassDNA"]
-        : false,
   }));
   return layers;
 };
@@ -237,49 +221,8 @@ const constructLayerToDna = (_dna = "", _layers = []) => {
   return mappedDnaToLayers;
 };
 
-/**
- * In some cases a DNA string may contain optional query parameters for options
- * such as bypassing the DNA isUnique check, this function filters out those
- * items without modifying the stored DNA.
- *
- * @param {String} _dna New DNA string
- * @returns new DNA string with any items that should be filtered, removed.
- */
-const filterDNAOptions = (_dna) => {
-  const dnaItems = _dna.split(DNA_DELIMITER);
-  const filteredDNA = dnaItems.filter((element) => {
-    const query = /(\?.*$)/;
-    const querystring = query.exec(element);
-    if (!querystring) {
-      return true;
-    }
-    const options = querystring[1].split("&").reduce((r, setting) => {
-      const keyPairs = setting.split("=");
-      return { ...r, [keyPairs[0]]: keyPairs[1] };
-    }, []);
-
-    return options.bypassDNA;
-  });
-
-  return filteredDNA.join(DNA_DELIMITER);
-};
-
-/**
- * Cleaning function for DNA strings. When DNA strings include an option, it
- * is added to the filename with a ?setting=value query string. It needs to be
- * removed to properly access the file name before Drawing.
- *
- * @param {String} _dna The entire newDNA string
- * @returns Cleaned DNA string without querystring parameters.
- */
-const removeQueryStrings = (_dna) => {
-  const query = /(\?.*$)/;
-  return _dna.replace(query, "");
-};
-
 const isDnaUnique = (_DnaList = new Set(), _dna = "") => {
-  const _filteredDNA = filterDNAOptions(_dna);
-  return !_DnaList.has(_filteredDNA);
+  return !_DnaList.has(_dna);
 };
 
 const createDna = (_layers) => {
@@ -296,9 +239,7 @@ const createDna = (_layers) => {
       random -= layer.elements[i].weight;
       if (random < 0) {
         return randNum.push(
-          `${layer.elements[i].id}:${layer.elements[i].filename}${
-            layer.bypassDNA ? "?bypassDNA=true" : ""
-          }`
+          `${layer.elements[i].id}:${layer.elements[i].filename}`
         );
       }
     }
@@ -374,17 +315,6 @@ const startCreating = async () => {
         await Promise.all(loadedElements).then((renderObjectArray) => {
           debugLogs ? console.log("Clearing canvas") : null;
           ctx.clearRect(0, 0, format.width, format.height);
-          if (gif.export) {
-            hashlipsGiffer = new HashlipsGiffer(
-              canvas,
-              ctx,
-              `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
-              gif.repeat,
-              gif.quality,
-              gif.delay
-            );
-            hashlipsGiffer.start();
-          }
           if (background.generate) {
             drawBackground();
           }
@@ -394,13 +324,7 @@ const startCreating = async () => {
               index,
               layerConfigurations[layerConfigIndex].layersOrder.length
             );
-            if (gif.export) {
-              hashlipsGiffer.add();
-            }
           });
-          if (gif.export) {
-            hashlipsGiffer.stop();
-          }
           debugLogs
             ? console.log("Editions left to create: ", abstractedIndexes)
             : null;
@@ -413,7 +337,7 @@ const startCreating = async () => {
             )}`
           );
         });
-        dnaList.add(filterDNAOptions(newDna));
+        dnaList.add(newDna);
         editionCount++;
         abstractedIndexes.shift();
       } else {

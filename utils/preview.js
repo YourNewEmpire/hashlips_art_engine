@@ -1,9 +1,14 @@
-const basePath = process.cwd();
+"use strict";
+
+const isLocal = typeof process.pkg === "undefined";
+const basePath = isLocal ? process.cwd() : path.dirname(process.execPath);
 const fs = require("fs");
+const path = require("path");
 const { createCanvas, loadImage } = require("canvas");
 const buildDir = `${basePath}/build`;
 
-const { preview } = require(`${basePath}/src/config.js`);
+console.log(path.join(basePath, "/src/config.js"));
+const { preview } = require(path.join(basePath, "/src/config.js"));
 
 // read json data
 const rawdata = fs.readFileSync(`${basePath}/build/json/_metadata.json`);

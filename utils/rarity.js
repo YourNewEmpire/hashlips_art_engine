@@ -1,8 +1,12 @@
-const basePath = process.cwd();
+"use strict";
+
+const path = require("path");
+const isLocal = typeof process.pkg === "undefined";
+const basePath = isLocal ? process.cwd() : path.dirname(process.execPath);
 const fs = require("fs");
 const layersDir = `${basePath}/layers`;
 
-const { layerConfigurations } = require(`${basePath}/src/config.js`);
+const { layerConfigurations } = require(path.join(basePath, "/src/config.js"));
 
 const { getElements } = require("../src/main.js");
 
@@ -25,7 +29,7 @@ layerConfigurations.forEach((config) => {
       // just get name and weight for each element
       let rarityDataElement = {
         trait: element.name,
-        weight: element.weight.toFixed(0),
+        chance: element.weight.toFixed(0),
         occurrence: 0, // initialize at 0
       };
       elementsForLayer.push(rarityDataElement);
@@ -59,16 +63,16 @@ data.forEach((element) => {
   });
 });
 
-// convert occurrences to occurence string
+// convert occurrences to percentages
 for (var layer in rarityData) {
   for (var attribute in rarityData[layer]) {
-    // get chance
-    let chance =
-      ((rarityData[layer][attribute].occurrence / editionSize) * 100).toFixed(2);
+    // convert to percentage
+    rarityData[layer][attribute].occurrence =
+      (rarityData[layer][attribute].occurrence / editionSize) * 100;
 
     // show two decimal places in percent
     rarityData[layer][attribute].occurrence =
-      `${rarityData[layer][attribute].occurrence} in ${editionSize} editions (${chance} %)`;
+      rarityData[layer][attribute].occurrence.toFixed(0) + "% out of 100%";
   }
 }
 
